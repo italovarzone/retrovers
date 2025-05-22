@@ -183,15 +183,20 @@
         class="container mx-auto px-6 py-4 flex justify-between items-center"
       >
         <div class="text-2xl font-bold">RETROVERS</div>
-        <div class="hidden md:flex space-x-8" id="menu-links">
-          <a href="#home" class="nav-link">Início</a>
-          <a href="#about" class="nav-link">Sobre</a>
-          <a href="#members" class="nav-link">Integrantes</a>
-          <a href="#media" class="nav-link">Portifólio</a>
-          <a href="#tour" class="nav-link">Agenda</a>
-          <a href="#contratar" class="nav-link">Contratar</a>
-          <a href="#contact" class="nav-link">Contato</a>
-        </div>
+          <div class="hidden md:flex space-x-8 items-center" id="menu-links">
+            <a href="#home" class="nav-link">Início</a>
+            <a href="#about" class="nav-link">Sobre</a>
+            <a href="#members" class="nav-link">Integrantes</a>
+            <a href="#media" class="nav-link">Portifólio</a>
+            <a href="#tour" class="nav-link">Agenda</a>
+
+            <!-- Botão chamativo cinza escuro -->
+            <a href="#contratar" class="bg-gray-800 text-white font-semibold px-4 py-2 rounded hover:bg-gray-900 transition">
+              Contratar
+            </a>
+
+            <a href="#contact" class="nav-link">Contato</a>
+          </div>
         <button
           class="md:hidden text-xl"
           id="menu-toggle"
@@ -206,7 +211,10 @@
           <a href="#members" class="block nav-link text-lg py-2 border-b border-gray-200">Integrantes</a>
           <a href="#media" class="block nav-link text-lg py-2 border-b border-gray-200">Portifólio</a>
           <a href="#tour" class="block nav-link text-lg py-2 border-b border-gray-200">Agenda</a>
-          <a href="#contratar" class="nav-link">Contratar</a>
+          <a href="#contratar" 
+            class="block bg-gray-800 !text-white font-semibold text-lg py-2 px-4 rounded hover:bg-gray-900 transition">
+            Contratar
+          </a>
           <a href="#contact" class="block nav-link text-lg py-2">Contato</a>
         </div>
     </nav>
