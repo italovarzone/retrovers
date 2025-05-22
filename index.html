@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RETROVERS | Sintonizando o seu passado</title>
+    <meta name="description" content="Site oficial da RETROVERS, conectando todos ao passado com muito rock. Confira nossas próximas datas, integrantes e conteúdo exclusivo.">
+    <meta property="og:title" content="RETROVERS | Sintonizando NOSSO passado">
+    <meta property="og:description" content="Junte-se à RETROVERS em sua turnê ao PASSADO.">
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="URL_DA_IMAGEM_DESTACADA" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+      .section {
+        scroll-snap-align: start;
+        min-height: 100vh;
+      }
+
+      .video-container {
+        position: relative;
+        padding-bottom: 56.25%;
+        height: 0;
+        overflow: hidden;
+      }
+      .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .band-member:hover .member-overlay {
+        opacity: 1;
+      }
+      .member-overlay {
+        transition: opacity 0.3s ease;
+      }
+      .tour-date:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      }
+      .nav-link {
+        position: relative;
+      }
+      .nav-link:after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: 0;
+        left: 0;
+        background-color: #000;
+        transition: width 0.3s ease;
+      }
+      .nav-link:hover:after {
+        width: 100%;
+      }
+      .gallery img:hover {
+        transform: scale(1.05);
+        transition: transform 0.3s ease;
+      }
+      #progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 4px;
+        background: black;
+        z-index: 50;
+        width: 0;
+      }
+
+      #mobile-menu a {
+      display: block;
+      text-align: center;
+      font-weight: 600;
+      color: #111;
+    }
+
+    #carouselModal {
+        backdrop-filter: blur(5px);
+    }
+
+    .swiper-slide img:hover {
+        transform: scale(1.05);
+        transition: transform 0.3s ease;
+    }
+
+    .mySwiper, .mySwiperFull {
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+
+
+    #videoModal button {
+        cursor: pointer;
+    }
+
+    #assistaAgora:hover {
+        background-color: rgba(0,0,0,0.7);
+    }
+
+    .animate-pulse {
+        animation: pulse 1.5s infinite;
+    }
+
+    #videoEndButtons button {
+        font-weight: bold;
+        width: 70%;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.4; }
+        100% { opacity: 1; }
+    }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  </head>
+  <body class="font-sans bg-gray-50 text-gray-900">
+    <!-- Barra de Progresso -->
+    <div id="progress-bar"></div>
+
+    <!-- Navegação -->
+    <nav class="fixed top-0 left-0 right-0 bg-white bg-opacity-90 z-50 shadow">
+      <div
+        class="container mx-auto px-6 py-4 flex justify-between items-center"
+      >
+        <div class="text-2xl font-bold">RETROVERS</div>
+        <div class="hidden md:flex space-x-8" id="menu-links">
+          <a href="#home" class="nav-link">Início</a>
+          <a href="#about" class="nav-link">Sobre</a>
+          <a href="#members" class="nav-link">Integrantes</a>
+          <a href="#media" class="nav-link">Portifólio</a>
+          <a href="#tour" class="nav-link">Agenda</a>
+          <a href="#contact" class="nav-link">Contato</a>
+        </div>
+        <button
+          class="md:hidden text-xl"
+          id="menu-toggle"
+          aria-label="Menu Mobile"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+        <div id="mobile-menu" class="md:hidden hidden flex-col bg-white px-6 py-4 space-y-4 shadow-lg">
+          <a href="#home" class="block nav-link text-lg py-2 border-b border-gray-200">Início</a>
+          <a href="#about" class="block nav-link text-lg py-2 border-b border-gray-200">Sobre</a>
+          <a href="#members" class="block nav-link text-lg py-2 border-b border-gray-200">Integrantes</a>
+          <a href="#media" class="block nav-link text-lg py-2 border-b border-gray-200">Portifólio</a>
+          <a href="#tour" class="block nav-link text-lg py-2 border-b border-gray-200">Agenda</a>
+          <a href="#contact" class="block nav-link text-lg py-2">Contato</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section id="home" class="section relative flex items-center justify-center text-white" style="background-color: #161616;">
+    <!-- Logo como fundo com opacidade fraca -->
+    <div class="absolute inset-0">
+        <img src="asserts/LOGO_BANDA.PNG" alt="Logo da banda" 
+            class="w-full h-full object-contain opacity-10" loading="lazy">
+    </div>
+
+    <div class="relative z-10 text-center">
+        <h1 class="text-5xl md:text-7xl font-bold mb-6">RETROVERS</h1>
+        <p class="text-xl md:text-2xl mb-8">Ajustando a frequência da MÚSICA ao passado de todos</p>
+        <a href="#tour" class="inline-block bg-white text-black px-8 py-3 rounded-full hover:bg-gray-200 transition">
+        VER DATAS
+        </a>
+    </div>
+
+    <div class="absolute bottom-10 left-0 right-0 text-center z-10">
+        <a href="#about" class="inline-block animate-bounce text-white">
+        <i class="fas fa-chevron-down text-2xl"></i>
+        </a>
+    </div>
+    </section>
+
+    <section id="about" class="section py-20 bg-white">
+      <div class="container mx-auto px-6">
+        <h2 class="text-4xl font-bold mb-12 text-center">NOSSA HISTÓRIA</h2>
+
+        <div class="flex flex-col lg:flex-row items-center justify-center gap-8">
+          <!-- Bloco com 3 imagens -->
+          <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-1/2">
+            <img src="asserts/about/about1.jpg" 
+                alt="Fase 1 da Banda" 
+                class="w-full sm:w-1/3 h-48 sm:h-64 object-cover rounded-lg shadow-lg opacity-10 blur-sm transition duration-500" 
+                loading="lazy">
+
+            <img src="asserts/about/about2.jpg" 
+                alt="Fase 2 da Banda" 
+                class="w-full sm:w-1/3 h-48 sm:h-64 object-cover rounded-lg shadow-lg opacity-10 blur-sm transition duration-500" 
+                loading="lazy">
+
+            <img src="asserts/about/about3.jpg" 
+                alt="Fase 3 da Banda" 
+                class="w-full sm:w-1/3 h-48 sm:h-64 object-cover rounded-lg shadow-lg opacity-10 blur-sm transition duration-500" 
+                loading="lazy">
+          </div>
+
+          <!-- Texto centralizado -->
+          <div class="w-full lg:w-1/2 flex flex-col justify-center items-center text-center text-lg space-y-6">
+            <p>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex, pariatur fuga reiciendis, natus eius ipsa alias asperiores, animi eligendi
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate, eaque doloribus lias esse...
+            </p>
+
+            <a href="historia.html" class="inline-block bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition">
+              História Completa
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTEGRANTES -->
+    <section id="members" class="section py-20 bg-gray-100">
+    <div class="container mx-auto px-6">
+        <h2 class="text-4xl font-bold mb-12 text-center">INTEGRANTES</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+        <div class="band-member">
+            <div class="relative mb-4 overflow-hidden rounded-full w-48 h-48 mx-auto">
+            <img src="asserts/integrantes/italo.png" alt="Ítalo Varzone" class="w-full h-full object-cover" loading="lazy">
+            <div class="member-overlay absolute inset-0 bg-black bg-opacity-50 opacity-0 flex items-center justify-center text-white">
+                <p>Guitarrista / Vocal</p>
+            </div>
+            </div>
+            <h3 class="text-2xl font-bold">Ítalo Varzone</h3>
+            <p class="text-gray-600">Guitarrista / Vocal</p>
+        </div>
+
+        <div class="band-member">
+            <div class="relative mb-4 overflow-hidden rounded-full w-48 h-48 mx-auto">
+            <img src="asserts/integrantes/davi.png" alt="Davi Ligeiro" class="w-full h-full object-cover" loading="lazy">
+            <div class="member-overlay absolute inset-0 bg-black bg-opacity-50 opacity-0 flex items-center justify-center text-white">
+                <p>Contrabaixo</p>
+            </div>
+            </div>
+            <h3 class="text-2xl font-bold">Davi Ligeiro</h3>
+            <p class="text-gray-600">Contrabaixo</p>
+        </div>
+
+        <div class="band-member">
+            <div class="relative mb-4 overflow-hidden rounded-full w-48 h-48 mx-auto">
+            <img src="asserts/integrantes/afonso.png" alt="Afonso Monzani" class="w-full h-full object-cover" loading="lazy">
+            <div class="member-overlay absolute inset-0 bg-black bg-opacity-50 opacity-0 flex items-center justify-center text-white">
+                <p>Tecladista / Sopro</p>
+            </div>
+            </div>
+            <h3 class="text-2xl font-bold">Afonso Monzani</h3>
+            <p class="text-gray-600">Tecladista / Sopro</p>
+        </div>
+
+        <div class="band-member">
+            <div class="relative mb-4 overflow-hidden rounded-full w-48 h-48 mx-auto">
+            <img src="asserts/integrantes/ruan.png" alt="Ruan Moraes" class="w-full h-full object-cover" loading="lazy">
+            <div class="member-overlay absolute inset-0 bg-black bg-opacity-50 opacity-0 flex items-center justify-center text-white">
+                <p>Baterista</p>
+            </div>
+            </div>
+            <h3 class="text-2xl font-bold">Ruan Moraes</h3>
+            <p class="text-gray-600">Baterista</p>
+        </div>
+        </div>
+    </div>
+    </section>
+
+    <!-- MÍDIA -->
+    <section id="media" class="section py-20 bg-white">
+      <div class="container mx-auto px-6">
+        <h2 class="text-4xl font-bold mb-12 text-center">MÍDIA</h2>
+        <h3 class="text-2xl font-bold mb-6">APRESENTAÇÕES AO VIVO</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <div class="video-container rounded-lg overflow-hidden shadow-lg">
+            <iframe
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              title="Vídeo ao vivo"
+              frameborder="0"
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+          </div>
+          <div class="video-container rounded-lg overflow-hidden shadow-lg">
+            <iframe
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              title="Vídeo ao vivo"
+              frameborder="0"
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+          </div>
+        </div>
+        <h3 class="text-2xl font-bold mb-6">GALERIA DE FOTOS</h3>
+        <!-- Botão ver todas -->
+        <div class="text-center mb-6">
+        <button id="expandCarousel" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition">
+            Ver todas
+        </button>
+        </div>
+
+        <!-- Swiper normal -->
+        <div class="swiper mySwiper rounded-lg shadow-lg">
+        <div class="swiper-wrapper">
+            <!-- Repita até 20-30 imagens -->
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_1.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_9.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_12.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_19.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_37.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_39.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_67.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_94.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <!-- ... mais imagens -->
+        </div>
+        <div class="swiper-pagination"></div>
+        </div>
+    </div>
+    </section>
+
+    <!-- TURNÊ -->
+    <section id="tour" class="section py-20 bg-gray-100">
+      <div class="container mx-auto px-6">
+        <h2 class="text-4xl font-bold mb-12 text-center">PRÓXIMOS SHOWS</h2>
+        <div class="max-w-3xl mx-auto space-y-4">
+          <div class="tour-date bg-white p-6 rounded-lg shadow transition">
+            <div
+              class="flex flex-col md:flex-row md:justify-between md:items-center"
+            >
+              <div>
+                <h3 class="text-xl font-bold">Pub Bar Sr. Café</h3>
+                <p class="text-gray-600">Leme, SP</p>
+              </div>
+              <p class="text-lg">15 de Julho - 19h00</p>
+              <a
+                href="#"
+                class="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 transition"
+                >INGRESSOS</a
+              >
+            </div>
+          </div>
+          <!-- Adicione mais datas -->
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTATO -->
+    <section id="contact" class="section py-20 bg-white">
+      <div class="container mx-auto px-6">
+        <h2 class="text-4xl font-bold mb-12 text-center">CONTATO</h2>
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row gap-10">
+          <div class="md:w-1/2 space-y-6">
+            <h3 class="text-2xl font-bold">Fale Conosco</h3>
+            <p>Para orçamentos, informações a mais ou dúvidas, entre em contato:</p>
+            <div>
+              <h4 class="font-bold">Assessoria</h4>
+              <p>Rebel Management</p>
+              <p>Email: retroversrtv@gmail.com</p>
+              <p>Davi: 19 99653-8569</p>
+              <p>Ítalo: 19 99148-0440</p>
+            </div>
+            <div class="flex space-x-4 text-2xl">
+              <a href="#" aria-label="Instagram"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a href="#" aria-label="YouTube"
+                ><i class="fab fa-youtube"></i
+              ></a>
+              <a href="#" aria-label="Spotify"
+                ><i class="fab fa-spotify"></i
+              ></a>
+            </div>
+          </div>
+          <div class="md:w-1/2">
+            <form id="contact-form" class="space-y-4">
+              <input
+                type="text"
+                name="nome"
+                required
+                placeholder="Nome"
+                class="w-full px-4 py-2 border rounded-lg"
+              />
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder="Email"
+                class="w-full px-4 py-2 border rounded-lg"
+              />
+              <input
+                type="text"
+                name="assunto"
+                required
+                placeholder="Assunto"
+                class="w-full px-4 py-2 border rounded-lg"
+              />
+              <textarea
+                name="mensagem"
+                rows="4"
+                required
+                placeholder="Mensagem"
+                class="w-full px-4 py-2 border rounded-lg"
+              ></textarea>
+              <button
+                type="submit"
+                class="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 w-full"
+              >
+                ENVIAR
+              </button>
+              <p id="success-message" class="text-green-500 hidden">
+                Mensagem enviada com sucesso!
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RODAPÉ -->
+    <footer class="bg-black text-white py-6 mt-20">
+      <div class="container mx-auto px-6 text-center">
+        <p>&copy; 2025 RETROVERS. Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <!-- Modal de Apresentação -->
+    <div id="videoModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 hidden">
+    <div class="relative w-full max-w-sm">
+        <!-- Botão de Fechar -->
+        <button id="closeModal" class="absolute top-4 right-4 text-white text-4xl font-bold hover:text-red-500 z-20">&times;</button>
+        
+        <!-- Vídeo -->
+        <div class="relative">
+        <video id="apresentacaoVideo" class="w-full rounded-lg">
+            <source src="asserts/retorno.mp4" type="video/mp4">
+            Seu navegador não suporta a reprodução de vídeo.
+        </video>
+
+        <!-- Botão Assista Agora -->
+        <button id="assistaAgora" class="absolute inset-0 flex items-center justify-center text-white font-bold text-xl md:text-2xl bg-black bg-opacity-50 animate-pulse">
+            Assista agora
+        </button>
+
+        <!-- Botões após fim do vídeo -->
+        <div id="videoEndButtons" class="absolute inset-0 flex flex-col items-center justify-center space-y-4 bg-black bg-opacity-50 hidden">
+            <button id="assistirNovamente" class="bg-white text-black px-4 py-2 rounded hover:bg-gray-200 transition">Assistir novamente</button>
+            <button id="fecharModalFinal" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Fechar</button>
+        </div>
+        </div>
+    </div>
+    </div>
+
+    
+    <!-- Modal Fullscreen -->
+    <div id="carouselModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 hidden">
+    <div class="relative w-full h-full">
+        <button id="closeCarousel" class="absolute top-4 right-4 text-white text-4xl font-bold hover:text-red-500 z-50">&times;</button>
+
+        <div class="swiper mySwiperFull h-full">
+        <div class="swiper-wrapper">
+            <!-- As mesmas imagens da versão compacta -->
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_1.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_9.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_12.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_19.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_37.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_39.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_67.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <div class="swiper-slide flex items-center justify-center">
+            <img src="asserts/29/retrovers29_94.JPG" class="max-h-full max-w-full rounded-lg" loading="lazy">
+            </div>
+            <!-- ... mais imagens -->
+        </div>
+        <div class="swiper-button-next text-white"></div>
+        <div class="swiper-button-prev text-white"></div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Modal de Feedback (Sucesso ou Erro) -->
+    <div id="feedbackModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
+      <div class="bg-white rounded-lg p-8 text-center">
+        <div id="feedbackIcon" class="text-5xl mb-4"></div>
+        <h2 id="feedbackTitle" class="text-2xl font-bold mb-2"></h2>
+        <p id="feedbackMessage" class="text-gray-600"></p>
+        <button id="closeFeedbackModal" class="mt-4 bg-black text-white px-4 py-2 rounded hover:bg-gray-800">
+          Fechar
+        </button>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script>
+      (function(){
+        emailjs.init("B9oo9seYSBoXZpQlx");
+      })();
+
+      const form = document.getElementById("contact-form");
+      const feedbackModal = document.getElementById("feedbackModal");
+      const feedbackIcon = document.getElementById("feedbackIcon");
+      const feedbackTitle = document.getElementById("feedbackTitle");
+      const feedbackMessage = document.getElementById("feedbackMessage");
+      const closeFeedbackModal = document.getElementById("closeFeedbackModal");
+
+      form.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        emailjs.sendForm('service_jcj67a5', 'template_pfwpfn5', this)
+          .then(function() {
+            mostrarFeedback('success');
+          }, function() {
+            mostrarFeedback('error');
+          })
+          .finally(function() {
+            form.reset();
+          });
+      });
+
+      closeFeedbackModal.addEventListener('click', () => {
+        feedbackModal.classList.add('hidden');
+      });
+
+      function mostrarFeedback(status) {
+        feedbackModal.classList.remove('hidden');
+        
+        if (status === 'success') {
+          feedbackIcon.innerHTML = '<i class="fas fa-check-circle text-green-500 animate-pulse"></i>';
+          feedbackTitle.textContent = 'Enviado com sucesso!';
+          feedbackMessage.textContent = 'Obrigado pelo contato, responderemos em breve.';
+        } else {
+          feedbackIcon.innerHTML = '<i class="fas fa-times-circle text-red-500 animate-pulse"></i>';
+          feedbackTitle.textContent = 'Erro ao enviar!';
+          feedbackMessage.textContent = 'Tente novamente mais tarde.';
+        }
+      }
+
+      document.getElementById("menu-toggle").addEventListener("click", () => {
+        document.getElementById("mobile-menu").classList.toggle("hidden");
+      });
+
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", (e) => {
+          e.preventDefault();
+          const target = document.querySelector(anchor.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth" });
+          }
+          document.getElementById("mobile-menu")?.classList.add("hidden");
+        });
+      });
+
+      window.addEventListener("scroll", () => {
+        const scroll = window.scrollY;
+        const height = document.body.scrollHeight - window.innerHeight;
+        const progress = (scroll / height) * 100;
+        document.getElementById("progress-bar").style.width = `${progress}%`;
+      });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('videoModal');
+            const closeModal = document.getElementById('closeModal');
+            const fecharModalFinal = document.getElementById('fecharModalFinal');
+            const video = document.getElementById('apresentacaoVideo');
+            const assistaAgora = document.getElementById('assistaAgora');
+            const videoEndButtons = document.getElementById('videoEndButtons');
+            const assistirNovamente = document.getElementById('assistirNovamente');
+
+            // Abrir modal automaticamente ao carregar a página
+            modal.classList.remove('hidden');
+
+            // Botão "Assista Agora"
+            assistaAgora.addEventListener('click', () => {
+            video.play();
+            assistaAgora.style.display = 'none';
+            });
+
+            // Ao terminar o vídeo
+            video.addEventListener('ended', () => {
+            videoEndButtons.classList.remove('hidden');
+            });
+
+            // "Assistir novamente"
+            assistirNovamente.addEventListener('click', () => {
+            video.currentTime = 0;
+            video.play();
+            videoEndButtons.classList.add('hidden');
+            });
+
+            // Botão "Fechar" no topo
+            closeModal.addEventListener('click', fecharTudo);
+
+            // Botão "Fechar" após vídeo
+            fecharModalFinal.addEventListener('click', fecharTudo);
+
+            function fecharTudo() {
+            modal.classList.add('hidden');
+            video.pause();
+            video.currentTime = 0;
+            assistaAgora.style.display = 'flex';
+            videoEndButtons.classList.add('hidden');
+            }
+        });
+
+    // Inicialização do Swiper compacto com autoplay
+    var swiper = new Swiper(".mySwiper", {
+        loop: true,
+        slidesPerView: 1,
+        spaceBetween: 20,
+        pagination: { el: ".swiper-pagination", clickable: true },
+        autoplay: { delay: 8000 },
+        breakpoints: {
+        640: { slidesPerView: 2 },
+        768: { slidesPerView: 3 },
+        1024: { slidesPerView: 4 }
+        }
+    });
+
+    // Swiper em tela cheia
+    var swiperFull = new Swiper(".mySwiperFull", {
+        loop: true,
+        slidesPerView: 1,
+        spaceBetween: 20,
+        navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev"
+        }
+    });
+
+    const expandBtn = document.getElementById('expandCarousel');
+    const modal = document.getElementById('carouselModal');
+    const closeBtn = document.getElementById('closeCarousel');
+
+    expandBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+    </script>
+  </body>
+</html>
