@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Apple-Style Photo Gallery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #000;
+      color: #fff;
+      font-size: 1.25rem;
+    }
+    .breadcrumb span {
+      background: rgba(255,255,255,0.1);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      margin: 0 0.25rem;
+      cursor: pointer;
+    }
+    .card {
+      background: #1f2937; /* Gray-800 */
+      border-radius: 0.75rem;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .card:hover { background: #374151; }
+    .modal { background: rgba(0, 0, 0, 0.9); }
+    .modal img { max-height: 90vh; max-width: 90vw; }
+  </style>
+</head>
+
+<body class="overflow-x-hidden">
+
+<!-- Loading Screen -->
+<div id="loading-screen" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center">
+  <div class="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mb-4"></div>
+  <p class="text-white text-lg">Conectando ao Google Drive...</p>
+</div>
+
+<!-- Main Gallery -->
+<div id="gallery" class="min-h-screen flex flex-col opacity-0 p-6 space-y-6">
+
+  <!-- Header -->
+    <header class="flex justify-between items-center p-6">
+        <!-- Navbar -->
+        <nav class="fixed top-0 left-0 right-0 bg-white bg-opacity-90 z-50 shadow">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-bold text-gray-900">RETROVERS</a>
+            <div class="flex space-x-6 items-center">
+            <a href="index.html#media" class="text-gray-600 hover:text-black transition">← Voltar</a>
+            <!-- Pode adicionar mais links aqui -->
+            </div>
+        </div>
+        </nav>
+    </header>
+
+  <!-- Breadcrumb -->
+  <div id="breadcrumb" class="breadcrumb flex flex-wrap justify-start items-center space-x-2"></div>
+
+  <!-- Current Folder Name -->
+  <div id="current-folder" class="text-gray-300 text-2xl font-semibold mb-2"></div>
+
+  <!-- Period Indicator -->
+  <div id="period-indicator" class="text-gray-400 text-lg"></div>
+
+  <!-- Folders Section -->
+  <div>
+    <h2 class="text-xl font-semibold mb-2">Pastas</h2>
+    <div id="folders-container" class="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"></div>
+  </div>
+
+  <!-- Files Section -->
+  <div>
+    <h2 class="text-xl font-semibold mb-2">Arquivos</h2>
+    <div id="files-container" class="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="fixed inset-0 hidden z-50 modal flex items-center justify-center">
+  <button id="close-modal" class="absolute top-4 right-4 text-white text-4xl">&times;</button>
+  <img id="modal-image" class="max-w-full max-h-full hidden">
+  <iframe id="modal-video" class="w-full max-w-5xl aspect-video hidden" frameborder="0" allow="autoplay; fullscreen"></iframe>
+</div>
+
+<script>
+const GOOGLE_DRIVE_FOLDER_ID = '1UKY_h-3fSGNsGv0TuYgMmTpMNy00fh1T';
+const API_KEY = 'AIzaSyDk_k3N0gSwJrYPJPvt8oM88Hlzxl4TgOA';
+
+let currentFolderId = GOOGLE_DRIVE_FOLDER_ID;
+let mediaItems = [];
+let pathStack = [{ id: GOOGLE_DRIVE_FOLDER_ID, name: 'Raiz' }];
+
+const foldersContainer = document.getElementById('folders-container');
+const filesContainer = document.getElementById('files-container');
+const loadingScreen = document.getElementById('loading-screen');
+const gallery = document.getElementById('gallery');
+const periodIndicator = document.getElementById('period-indicator');
+const breadcrumb = document.getElementById('breadcrumb');
+const currentFolder = document.getElementById('current-folder');
+
+const modal = document.getElementById('modal');
+const modalImage = document.getElementById('modal-image');
+let modalVideo = document.getElementById('modal-video');
+const closeModal = document.getElementById('close-modal');
+
+closeModal.addEventListener('click', () => {
+  modal.classList.add('hidden');
+  modalImage.classList.add('hidden');
+  modalVideo.classList.add('hidden');
+  modalVideo.src = '';
+});
+
+function updateBreadcrumb() {
+  breadcrumb.innerHTML = '';
+  pathStack.forEach((p, index) => {
+    const span = document.createElement('span');
+    span.textContent = p.name;
+    span.addEventListener('click', () => {
+      pathStack = pathStack.slice(0, index + 1);
+      currentFolderId = p.id;
+      fetchFromGoogleDrive();
+    });
+    breadcrumb.appendChild(span);
+  });
+}
+
+function updateCurrentFolderName() {
+  const current = pathStack[pathStack.length - 1];
+  currentFolder.textContent = `📁 ${current.name}`;
+}
+
+async function fetchFromGoogleDrive() {
+  try {
+    const response = await axios.get(
+      `https://www.googleapis.com/drive/v3/files?q='${currentFolderId}'+in+parents&key=${API_KEY}&fields=files(id,name,mimeType,thumbnailLink,createdTime,webContentLink,videoMediaMetadata)`
+    );
+
+    mediaItems = response.data.files.map(file => ({
+      id: file.id,
+      type: file.mimeType === 'application/vnd.google-apps.folder' ? 'folder'
+          : (file.mimeType.includes('video') ? 'video' : 'image'),
+      url: file.mimeType.includes('video')
+        ? `https://drive.google.com/file/d/${file.id}/preview`
+        : (file.thumbnailLink ? file.thumbnailLink.replace('=s220', '=s1000') : ''),
+      date: file.createdTime,
+      title: file.name
+    }));
+
+    renderGallery();
+    updatePeriod();
+    updateBreadcrumb();
+    updateCurrentFolderName();
+  } catch (error) {
+    console.error('Erro:', error);
+  }
+}
+
+function renderGallery() {
+  foldersContainer.innerHTML = '';
+  filesContainer.innerHTML = '';
+
+  const folders = mediaItems.filter(i => i.type === 'folder');
+  const files = mediaItems.filter(i => i.type !== 'folder');
+
+  folders.forEach(item => foldersContainer.appendChild(createFolderCard(item)));
+  files.forEach(item => filesContainer.appendChild(createFileCard(item)));
+}
+
+function createFolderCard(item) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `<div class="flex items-center gap-2"><i class="fas fa-folder text-2xl"></i> ${item.title}</div><i class="fas fa-ellipsis-v"></i>`;
+  card.addEventListener('click', () => {
+    pathStack.push({ id: item.id, name: item.title });
+    currentFolderId = item.id;
+    fetchFromGoogleDrive();
+  });
+  return card;
+}
+
+function createFileCard(item) {
+  const container = document.createElement('div');
+  container.className = 'overflow-hidden rounded-lg shadow-md hover:shadow-lg transition cursor-pointer';
+
+  if (item.type === 'image') {
+    const img = document.createElement('img');
+    img.src = item.url;
+    img.alt = item.title;
+    img.className = 'w-full h-full object-cover';
+
+    container.appendChild(img);
+    container.addEventListener('click', () => {
+      modalImage.src = item.url;
+      modalImage.classList.remove('hidden');
+      modalVideo.classList.add('hidden');
+      modal.classList.remove('hidden');
+    });
+
+  } else if (item.type === 'video') {
+  const preview = document.createElement('img');
+  preview.src = `https://drive.google.com/thumbnail?id=${item.id}`;
+  preview.alt = item.title;
+  preview.className = 'w-full h-full object-cover';
+  container.appendChild(preview);
+
+  container.addEventListener('click', () => {
+    modalVideo.src = `https://drive.google.com/file/d/${item.id}/preview`;
+    modalVideo.classList.remove('hidden');
+    modalImage.classList.add('hidden');
+    modal.classList.remove('hidden');
+  });
+}
+
+  return container;
+}
+
+function updatePeriod() {
+  const files = mediaItems.filter(i => i.type !== 'folder');
+  if (files.length === 0) {
+    periodIndicator.textContent = '';
+    return;
+  }
+  const dates = files.map(i => new Date(i.date));
+  const minDate = new Date(Math.min(...dates));
+  const maxDate = new Date(Math.max(...dates));
+
+  const formatted = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' });
+  periodIndicator.textContent = formatted.format(minDate) === formatted.format(maxDate)
+    ? formatted.format(minDate)
+    : `${formatted.format(minDate)} - ${formatted.format(maxDate)}`;
+}
+
+function init() {
+  setTimeout(() => {
+    loadingScreen.style.opacity = '0';
+    setTimeout(() => {
+      loadingScreen.style.display = 'none';
+      gallery.style.opacity = '1';
+      fetchFromGoogleDrive();
+    }, 500);
+  }, 1000);
+}
+
+init();
+</script>
+
+</body>
+</html>
