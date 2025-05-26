@@ -214,24 +214,34 @@ function renderGallery() {
   const folders = mediaItems.filter(i => i.type === 'folder');
   const files = mediaItems.filter(i => i.type !== 'folder');
 
-  folders.forEach(item => foldersContainer.appendChild(createFolderCard(item)));
+  if (folders.length === 0) {
+    const noFoldersMsg = document.createElement('p');
+    noFoldersMsg.className = 'text-gray-400';
+    noFoldersMsg.textContent = 'Sem pastas.';
+    foldersContainer.appendChild(noFoldersMsg);
+  } else {
+    folders.forEach(item => foldersContainer.appendChild(createFolderCard(item)));
+  }
 
   const selectedFilter = document.getElementById('filter').value;
   const filteredFiles = selectedFilter === 'all' ? files : files.filter(f => f.type === selectedFilter);
 
-  const groupSize = 10;
-  filteredFiles.forEach((item, index) => {
-    const container = createFileCard(item);
-
-    // Define um atributo data-group para cada bloco de 10 imagens
-    const groupIndex = Math.floor(index / groupSize);
-    container.setAttribute('data-group', groupIndex);
-
-    filesContainer.appendChild(container);
-  });
-
-  generateGroupPeriods(filteredFiles, groupSize);
-  updateVisiblePeriod();
+  if (filteredFiles.length === 0) {
+    const noFilesMsg = document.createElement('p');
+    noFilesMsg.className = 'text-gray-400';
+    noFilesMsg.textContent = 'Sem Fotos/Vídeos.';
+    filesContainer.appendChild(noFilesMsg);
+  } else {
+    const groupSize = 10;
+    filteredFiles.forEach((item, index) => {
+      const container = createFileCard(item);
+      const groupIndex = Math.floor(index / groupSize);
+      container.setAttribute('data-group', groupIndex);
+      filesContainer.appendChild(container);
+    });
+    generateGroupPeriods(filteredFiles, groupSize);
+    updateVisiblePeriod();
+  }
 }
 
 function createFolderCard(item) {
