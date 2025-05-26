@@ -490,6 +490,7 @@
                 placeholder="Mensagem"
                 class="w-full px-4 py-2 border rounded-lg"
               ></textarea>
+              <div class="g-recaptcha" data-sitekey="6LcoBkorAAAAAFL8USEHmVfFv2o47LEiPmo3r_JJ"></div>
               <button
                 type="submit"
                 class="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 w-full"
@@ -607,6 +608,13 @@
       form.addEventListener("submit", function(e) {
         e.preventDefault();
 
+        const recaptchaResponse = grecaptcha.getResponse();
+
+        if (!recaptchaResponse) {
+          mostrarFeedback('recaptcha');
+          return;
+        }
+
         emailjs.sendForm('service_jcj67a5', 'template_pfwpfn5', this)
           .then(function() {
             mostrarFeedback('success');
@@ -615,6 +623,7 @@
           })
           .finally(function() {
             form.reset();
+            grecaptcha.reset();
           });
       });
 
@@ -624,11 +633,15 @@
 
       function mostrarFeedback(status) {
         feedbackModal.classList.remove('hidden');
-        
+
         if (status === 'success') {
           feedbackIcon.innerHTML = '<i class="fas fa-check-circle text-green-500 animate-pulse"></i>';
           feedbackTitle.textContent = 'Enviado com sucesso!';
           feedbackMessage.textContent = 'Obrigado pelo contato, responderemos em breve.';
+        } else if (status === 'recaptcha') {
+          feedbackIcon.innerHTML = '<i class="fas fa-exclamation-circle text-yellow-500 animate-pulse"></i>';
+          feedbackTitle.textContent = 'Validação obrigatória!';
+          feedbackMessage.textContent = 'Por favor, confirme que você não é um robô.';
         } else {
           feedbackIcon.innerHTML = '<i class="fas fa-times-circle text-red-500 animate-pulse"></i>';
           feedbackTitle.textContent = 'Erro ao enviar!';
@@ -658,12 +671,12 @@
         document.getElementById("progress-bar").style.width = `${progress}%`;
       });
 
-        document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function() {
         fetch('shows.json')
           .then(response => response.json())
           .then(shows => {
             const container = document.getElementById('shows-container');
-            
+
             if (!shows.length) {
               const emptyMsg = document.createElement('div');
               emptyMsg.className = 'text-center text-gray-600 text-lg';
@@ -697,99 +710,85 @@
             container.appendChild(errorMsg);
           });
 
-            const modal = document.getElementById('videoModal');
-            const closeModal = document.getElementById('closeModal');
-            const fecharModalFinal = document.getElementById('fecharModalFinal');
-            const video = document.getElementById('apresentacaoVideo');
-            const assistaAgora = document.getElementById('assistaAgora');
-            const videoEndButtons = document.getElementById('videoEndButtons');
-            const assistirNovamente = document.getElementById('assistirNovamente');
+        const modal = document.getElementById('videoModal');
+        const closeModal = document.getElementById('closeModal');
+        const fecharModalFinal = document.getElementById('fecharModalFinal');
+        const video = document.getElementById('apresentacaoVideo');
+        const assistaAgora = document.getElementById('assistaAgora');
+        const videoEndButtons = document.getElementById('videoEndButtons');
+        const assistirNovamente = document.getElementById('assistirNovamente');
 
-            // Abrir modal automaticamente ao carregar a página
-            modal.classList.remove('hidden');
+        modal.classList.remove('hidden');
 
-            // Botão "Assista Agora"
-            assistaAgora.addEventListener('click', () => {
-            video.play();
-            assistaAgora.style.display = 'none';
-            });
-
-            // Ao terminar o vídeo
-            video.addEventListener('ended', () => {
-            videoEndButtons.classList.remove('hidden');
-            });
-
-            // "Assistir novamente"
-            assistirNovamente.addEventListener('click', () => {
-            video.currentTime = 0;
-            video.play();
-            videoEndButtons.classList.add('hidden');
-            });
-
-            // Botão "Fechar" no topo
-            closeModal.addEventListener('click', fecharTudo);
-
-            // Botão "Fechar" após vídeo
-            fecharModalFinal.addEventListener('click', fecharTudo);
-
-            function fecharTudo() {
-            modal.classList.add('hidden');
-            video.pause();
-            video.currentTime = 0;
-            assistaAgora.style.display = 'flex';
-            videoEndButtons.classList.add('hidden');
-            }
+        assistaAgora.addEventListener('click', () => {
+          video.play();
+          assistaAgora.style.display = 'none';
         });
 
-    // Inicialização do Swiper compacto com autoplay
-    var swiper = new Swiper(".mySwiper", {
-      loop: true,
-      spaceBetween: 10,
-      pagination: { el: ".swiper-pagination", clickable: true },
-      autoplay: {
-        delay: 4000,
-        disableOnInteraction: false // continua após interação do usuário
-      },
-      breakpoints: {
-        0: {
-          slidesPerView: 1.5,
-        },
-        768: {
-          slidesPerView: 3,
-        },
-        1024: {
-          slidesPerView: 4.5,
-        }
-      }
-    });
+        video.addEventListener('ended', () => {
+          videoEndButtons.classList.remove('hidden');
+        });
 
-    var swiperFull = new Swiper(".mySwiperFull", {
-      loop: true,
-      slidesPerView: 1,
-      spaceBetween: 20,
-      navigation: {
-        nextEl: ".swiper-button-next",
-        prevEl: ".swiper-button-prev"
-      }
-    });
+        assistirNovamente.addEventListener('click', () => {
+          video.currentTime = 0;
+          video.play();
+          videoEndButtons.classList.add('hidden');
+        });
+
+        closeModal.addEventListener('click', fecharTudo);
+        fecharModalFinal.addEventListener('click', fecharTudo);
+
+        function fecharTudo() {
+          modal.classList.add('hidden');
+          video.pause();
+          video.currentTime = 0;
+          assistaAgora.style.display = 'flex';
+          videoEndButtons.classList.add('hidden');
+        }
+      });
+
+      var swiper = new Swiper(".mySwiper", {
+        loop: true,
+        spaceBetween: 10,
+        pagination: { el: ".swiper-pagination", clickable: true },
+        autoplay: {
+          delay: 4000,
+          disableOnInteraction: false
+        },
+        breakpoints: {
+          0: { slidesPerView: 1.5 },
+          768: { slidesPerView: 3 },
+          1024: { slidesPerView: 4.5 }
+        }
+      });
+
+      var swiperFull = new Swiper(".mySwiperFull", {
+        loop: true,
+        slidesPerView: 1,
+        spaceBetween: 20,
+        navigation: {
+          nextEl: ".swiper-button-next",
+          prevEl: ".swiper-button-prev"
+        }
+      });
 
       const expandBtn = document.getElementById('expandCarousel');
-      const modal = document.getElementById('carouselModal');
+      const carouselModal = document.getElementById('carouselModal');
       const closeBtn = document.getElementById('closeCarousel');
 
-      // Se quiser manter o botão "Ver todas"
-      expandBtn.addEventListener('click', () => {
-        modal.classList.remove('hidden');
-      });
+      if (expandBtn) {
+        expandBtn.addEventListener('click', () => {
+          carouselModal.classList.remove('hidden');
+        });
+      }
 
       closeBtn.addEventListener('click', () => {
-        modal.classList.add('hidden');
+        carouselModal.classList.add('hidden');
       });
 
-      // Clicar na imagem da galeria = abrir modal
       document.querySelectorAll('.mySwiper .swiper-slide img').forEach((img, index) => {
         img.addEventListener('click', () => {
-          modal.classList.remove('hidden');
+          carouselModal.classList.remove('hidden');
           swiperFull.slideToLoop(index, 0);
         });
       });
