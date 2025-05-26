@@ -66,12 +66,36 @@
 
   <!-- Breadcrumb -->
   <div id="breadcrumb" class="breadcrumb flex flex-wrap justify-start items-center space-x-2"></div>
+  <!-- Period Indicator -->
+  <div id="period-indicator" class="text-gray-400 text-lg sticky top-20 bg-black bg-opacity-70 z-40 px-4 py-2 rounded-lg w-fit">
+  </div>
 
   <!-- Current Folder Name -->
   <div id="current-folder" class="text-gray-300 text-2xl font-semibold mb-2"></div>
 
-  <!-- Period Indicator -->
-  <div id="period-indicator" class="text-gray-400 text-lg"></div>
+
+  <!-- Adicione esse bloco logo após o <div id="period-indicator"> -->
+<div class="mb-6 flex items-center space-x-3">
+  <span class="text-gray-400 text-xl">
+    <i class="fas fa-filter"></i>
+  </span>
+  
+  <div class="relative">
+    <select id="filter" 
+      class="appearance-none bg-gray-800 text-white text-base px-6 py-3 pr-10 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-600 transition min-w-[150px]">
+      <option value="all" selected>Todos</option>
+      <option value="image">Fotos</option>
+      <option value="video">Vídeos</option>
+    </select>
+    
+    <!-- Ícone de seta customizado -->
+    <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-white">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+  </div>
+</div>
+
+
 
   <!-- Folders Section -->
   <div>
@@ -87,11 +111,19 @@
 </div>
 
 <!-- Modal -->
-<div id="modal" class="fixed inset-0 hidden z-50 modal flex items-center justify-center">
+<div id="modal" class="fixed inset-0 hidden z-50 modal flex items-center justify-center bg-black bg-opacity-90">
   <button id="close-modal" class="absolute top-4 right-4 text-white text-4xl">&times;</button>
   <img id="modal-image" class="max-w-full max-h-full hidden">
-  <iframe id="modal-video" class="w-full max-w-5xl aspect-video hidden" frameborder="0" allow="autoplay; fullscreen"></iframe>
+  <iframe 
+    id="modal-video" 
+    class="w-full max-w-5xl aspect-video hidden" 
+    frameborder="0" 
+    allow="autoplay; fullscreen; picture-in-picture" 
+    allowfullscreen 
+    playsinline>
+  </iframe>
 </div>
+
 
 <script>
 const GOOGLE_DRIVE_FOLDER_ID = '1UKY_h-3fSGNsGv0TuYgMmTpMNy00fh1T';
@@ -99,7 +131,7 @@ const API_KEY = 'AIzaSyDk_k3N0gSwJrYPJPvt8oM88Hlzxl4TgOA';
 
 let currentFolderId = GOOGLE_DRIVE_FOLDER_ID;
 let mediaItems = [];
-let pathStack = [{ id: GOOGLE_DRIVE_FOLDER_ID, name: 'Raiz' }];
+let pathStack = [{ id: GOOGLE_DRIVE_FOLDER_ID, name: 'Início' }];
 
 const foldersContainer = document.getElementById('folders-container');
 const filesContainer = document.getElementById('files-container');
@@ -123,15 +155,24 @@ closeModal.addEventListener('click', () => {
 
 function updateBreadcrumb() {
   breadcrumb.innerHTML = '';
+
   pathStack.forEach((p, index) => {
     const span = document.createElement('span');
     span.textContent = p.name;
+    span.classList.add('cursor-pointer', 'hover:underline');
     span.addEventListener('click', () => {
       pathStack = pathStack.slice(0, index + 1);
       currentFolderId = p.id;
       fetchFromGoogleDrive();
     });
     breadcrumb.appendChild(span);
+
+    // Se não for o último, adiciona separador " / "
+    if (index < pathStack.length - 1) {
+      const separator = document.createElement('span');
+      separator.textContent = ' / ';
+      breadcrumb.appendChild(separator);
+    }
   });
 }
 
@@ -174,13 +215,29 @@ function renderGallery() {
   const files = mediaItems.filter(i => i.type !== 'folder');
 
   folders.forEach(item => foldersContainer.appendChild(createFolderCard(item)));
-  files.forEach(item => filesContainer.appendChild(createFileCard(item)));
+
+  const selectedFilter = document.getElementById('filter').value;
+  const filteredFiles = selectedFilter === 'all' ? files : files.filter(f => f.type === selectedFilter);
+
+  const groupSize = 10;
+  filteredFiles.forEach((item, index) => {
+    const container = createFileCard(item);
+
+    // Define um atributo data-group para cada bloco de 10 imagens
+    const groupIndex = Math.floor(index / groupSize);
+    container.setAttribute('data-group', groupIndex);
+
+    filesContainer.appendChild(container);
+  });
+
+  generateGroupPeriods(filteredFiles, groupSize);
+  updateVisiblePeriod();
 }
 
 function createFolderCard(item) {
   const card = document.createElement('div');
   card.className = 'card';
-  card.innerHTML = `<div class="flex items-center gap-2"><i class="fas fa-folder text-2xl"></i> ${item.title}</div><i class="fas fa-ellipsis-v"></i>`;
+  card.innerHTML = `<div class="flex items-center gap-2">${item.title}</div><i class="fa-regular fa-folder-open"></i>`;
   card.addEventListener('click', () => {
     pathStack.push({ id: item.id, name: item.title });
     currentFolderId = item.id;
@@ -250,6 +307,59 @@ function init() {
       fetchFromGoogleDrive();
     }, 500);
   }, 1000);
+
+  // Listener para o seletor de filtro
+  document.getElementById('filter').addEventListener('change', renderGallery);
+
+  window.addEventListener('scroll', updateVisiblePeriod);
+}
+
+let groupPeriods = [];
+
+function generateGroupPeriods(files, groupSize) {
+  groupPeriods = [];
+  const totalGroups = Math.ceil(files.length / groupSize);
+
+  for (let i = 0; i < totalGroups; i++) {
+    const groupFiles = files.slice(i * groupSize, (i + 1) * groupSize);
+    const dates = groupFiles.map(f => new Date(f.date));
+    const minDate = new Date(Math.min(...dates));
+    const maxDate = new Date(Math.max(...dates));
+
+    groupPeriods.push({ 
+      group: i, 
+      min: minDate, 
+      max: maxDate 
+    });
+  }
+}
+
+function updateVisiblePeriod() {
+  const fileElements = document.querySelectorAll('#files-container > div');
+
+  let closestGroup = null;
+  let minDistance = Infinity;
+
+  fileElements.forEach(el => {
+    const rect = el.getBoundingClientRect();
+    const distance = Math.abs(rect.top);
+
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestGroup = el.getAttribute('data-group');
+    }
+  });
+
+  if (closestGroup !== null) {
+    const period = groupPeriods.find(g => g.group == closestGroup);
+    if (period) {
+      const formatted = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+      const periodText = period.min.toDateString() === period.max.toDateString() 
+        ? formatted.format(period.min)
+        : `${formatted.format(period.min)} – ${formatted.format(period.max)}`;
+      periodIndicator.textContent = periodText;
+    }
+  }
 }
 
 init();
